@@ -11,5 +11,18 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(cuid())
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String   @unique
+  hash      String
+  userType  UserType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserType {
+  BUYER
+  REALTOR
+  ADMIN
 }
