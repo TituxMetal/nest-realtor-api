@@ -3,7 +3,11 @@ export type RegisterResponse = {
   email: string
   name: string
   phone: string
-  token: string
+  token: Token
+}
+
+export type LoginResponse = {
+  token: Token
 }
 
 export type JwtPayload = {
@@ -11,3 +15,10 @@ export type JwtPayload = {
   email: string
   name: string
 }
+
+export type LoginPayload = {
+  email: string
+  password: string
+}
+
+export type Token = string

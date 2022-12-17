@@ -1,11 +1,11 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { UserType } from '@prisma/client'
 
-import type { RegisterResponse } from '~/types'
+import type { LoginResponse, RegisterResponse } from '~/types'
 import { UserService } from '~/user'
 
 import { AuthService } from './auth.service'
-import { RegisterDto } from './dto'
+import { LoginDto, RegisterDto } from './dto'
 
 @Controller('auth')
 export class AuthController {
@@ -21,8 +21,12 @@ export class AuthController {
       userType: UserType.BUYER
     })
     const token = await this.authService.generateToken({ id, email, name })
-    const registerData = { id, email, name, phone, token }
 
-    return registerData
+    return { id, email, name, phone, token }
+  }
+
+  @Post('login')
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponse> {
+    return this.authService.login(loginDto)
   }
 }
