@@ -6,9 +6,18 @@ import { AppModule } from '~/app.module'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: true }
+    })
+  )
 
   const configService = app.get(ConfigService)
-  await app.listen(configService.get('PORT'))
+  const port = configService.get<number>('PORT') || 3333
+  const hostUrl = configService.get<string>('HOST') || 'localhost'
+
+  await app.listen(port, hostUrl, () => console.log(`Listen on http://${hostUrl}:${port}`))
 }
 bootstrap()
