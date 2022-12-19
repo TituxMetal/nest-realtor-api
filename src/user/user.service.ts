@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { Prisma, UserType } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import * as argon from 'argon2'
 
 import { PrismaService } from '~/prisma'
@@ -10,7 +10,7 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userData: UserInput): Promise<UserResponse> {
-    const { email, password, name, phone } = userData
+    const { email, password, name, phone, userType } = userData
     const userExists = await this.prisma.user.findUnique({ where: { email } })
 
     if (userExists) {
@@ -20,7 +20,7 @@ export class UserService {
     const hash = await argon.hash(password)
 
     try {
-      const newUser = { email, name, phone, hash, userType: UserType.BUYER }
+      const newUser = { email, name, phone, userType, hash }
       const user = await this.prisma.user.create({
         data: newUser,
         select: { id: true, email: true, name: true, phone: true }
@@ -28,8 +28,18 @@ export class UserService {
 
       return user
     } catch (error) {
+      console.log({ error })
       throw new UnauthorizedException('Invalid Credentials.')
     }
+  }
+
+  async verifyPassword(hash: string, plain: string): Promise<boolean> {
+    const passwordMatches = await argon.verify(hash, plain)
+
+    if (!passwordMatches) {
+      return false
+    }
+    return true
   }
 
   async findByEmail(email: string, options?: object) {
