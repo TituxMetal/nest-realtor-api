@@ -1,12 +1,6 @@
-export type RegisterResponse = {
-  id: string
-  email: string
-  name: string
-  phone: string
-  token: Token
-}
+import type { UserResponse } from '~/types'
 
-export type LoginResponse = {
+export type AuthUser = UserResponse & {
   token: Token
 }
 
@@ -19,6 +13,11 @@ export type JwtPayload = {
 export type LoginPayload = {
   email: string
   password: string
+}
+
+export type RegisterPayload = LoginPayload & {
+  name: string
+  phone: string
 }
 
 export type Token = string
