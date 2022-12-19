@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import * as argon from 'argon2'
+import { UserType } from '@prisma/client'
 
-import type { JwtPayload, LoginPayload, LoginResponse } from '~/types'
+import type { AuthUser, JwtPayload, LoginPayload, RegisterPayload, Token } from '~/types'
 import { UserService } from '~/user'
 
 @Injectable()
@@ -14,17 +14,18 @@ export class AuthService {
     private readonly userService: UserService
   ) {}
 
-  async generateToken(jwtPayload: JwtPayload): Promise<string> {
+  async generateToken(jwtPayload: JwtPayload): Promise<Token> {
     return await this.jwtService.signAsync(jwtPayload, {
       secret: this.config.getOrThrow('JWT_SECRET'),
       expiresIn: this.config.getOrThrow('JWT_EXPIRE')
     })
   }
 
-  async login(loginPayload: LoginPayload): Promise<LoginResponse> {
+  async login(loginPayload: LoginPayload): Promise<AuthUser> {
     const user = await this.userService.findByEmail(loginPayload.email, {
       id: true,
       email: true,
+      phone: true,
       name: true,
       hash: true
     })
@@ -33,8 +34,9 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied.')
     }
 
-    const { id, email, name, hash } = user
-    const passwordMatches = await argon.verify(hash, loginPayload.password)
+    const { id, email, name, phone, hash } = user
+
+    const passwordMatches = await this.userService.verifyPassword(hash, loginPayload.password)
 
     if (!passwordMatches) {
       throw new UnauthorizedException('Access Denied.')
@@ -42,6 +44,17 @@ export class AuthService {
 
     const token = await this.generateToken({ id, email, name })
 
-    return { token }
+    return { id, email, name, phone, token }
+  }
+
+  async register(registerPayload: RegisterPayload): Promise<AuthUser> {
+    const { id, email, name, phone } = await this.userService.create({
+      ...registerPayload,
+      userType: UserType.BUYER
+    })
+
+    const token = await this.generateToken({ id, email, name })
+
+    return { id, email, name, phone, token }
   }
 }
