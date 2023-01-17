@@ -12,16 +12,25 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  name      String
-  phone     String
   email     String   @unique
+  username  String   @unique
   hash      String
-  userType  UserType
+  tokens    Token[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-enum UserType {
+model Token {
+  id        String   @id @default(cuid())
+  access    String
+  role      Role     @default(BUYER)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
   BUYER
   REALTOR
   ADMIN

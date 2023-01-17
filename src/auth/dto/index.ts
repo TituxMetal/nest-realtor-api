@@ -1,2 +1,3 @@
-export { default as RegisterDto } from './register.dto'
-export { default as LoginDto } from './login.dto'
+export * from './auth-response.dto'
+export * from './login-user.dto'
+export * from './register-user.dto'
