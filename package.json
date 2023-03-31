@@ -19,9 +19,9 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
   },
   "dependencies": {
-    "@nestjs/common": "9.3.11",
+    "@nestjs/common": "9.3.12",
     "@nestjs/config": "2.3.1",
-    "@nestjs/core": "9.3.11",
+    "@nestjs/core": "9.3.12",
     "@nestjs/jwt": "10.0.3",
     "@nestjs/passport": "9.0.3",
     "@nestjs/platform-express": "9.3.12",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "9.3.0",
-    "@nestjs/schematics": "9.0.4",
+    "@nestjs/schematics": "9.1.0",
     "@nestjs/testing": "9.3.12",
     "@types/express": "4.17.17",
     "@types/jest": "29.5.0",
